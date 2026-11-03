@@ -1,7 +1,9 @@
 #include <vector>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <sstream>
+#include <cctype>
 
 using namespace std;
 
@@ -30,9 +32,15 @@ class CampusGraph {
 	
 	private:
 		vector<Building*> buildings;
+		int connectionCount;
 	
 	public:
 		// Constructor
 		CampusGraph();
+		
+		// Get
+		Building* GetBuildingByName(string name);
+		void DisplayAdjacencyList();
+		void ViewGraphStats();
 	
 };
