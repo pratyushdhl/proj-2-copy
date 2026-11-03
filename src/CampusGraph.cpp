@@ -190,3 +190,39 @@ void CampusGraph::ViewGraphStats() {
 	cout << "Total connections: " << connectionCount << "\n" << endl;
 	cout << "--------------------------------------------------------" << endl;
 }
+
+// Get reachable buildings using BFS
+void CampusGraph::GetReachableBuildings(Building* start) {
+	vector<Building*> visited;
+	vector<int> distances;
+	
+	// Start at start and add it to vectors
+	visited.push_back(start);
+	distances.push_back(0);
+	for (int i = 0; i < visited.size(); i++) {
+		// Check each adjacent of ith building
+		for (int j = 0; j < visited[i]->GetAdjacent().size(); j++) {
+			// Check if visited
+			bool isvisited = false;
+			for (int k = 0; k < visited.size(); k++) {
+				if (visited[k] == visited[i]->GetAdjacent()[j]) {
+					isvisited = true;
+					break;
+				}
+			}
+			if (!isvisited) {
+				// Unvisited; add to vectors
+				visited.push_back(visited[i]->GetAdjacent()[j]);
+				distances.push_back(distances[i]+1);
+			}
+		}
+	}
+	
+	// Display results
+	cout << "\nFrom " << start->GetName() << ":" << endl;
+	for (int i = 0; i < visited.size(); i++) {
+		cout << visited[i]->GetName() << " (distance " << distances[i] << ")" << endl;
+	}
+	cout << "\nReachable: " << visited.size() << " of " << buildings.size() << " buildings\n" << endl;
+	
+}

@@ -40,6 +40,10 @@ int main() {
 		}
 		cout << endl;
 		
+		// Variables used in cases
+		string name;
+		Building* building = nullptr;
+		
 		// Process choice
 		switch (choice) {
 			case 1:
@@ -64,6 +68,16 @@ int main() {
 				break;
 			case 7:
 				// Find reachable buildings (BFS)
+				cout << "Enter start building: ";
+				cin.ignore();
+				getline(cin, name);
+				building = campusGraph.GetBuildingByName(name);
+				if (building == nullptr) {
+					// Invalid building, return to menu 
+					cout << "\nInvalid building name.\n" << endl;
+					break;
+				}
+				campusGraph.GetReachableBuildings(building);
 				break;
 			case 8:
 				// Find shortest path (BFS)

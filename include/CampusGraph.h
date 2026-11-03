@@ -2,6 +2,7 @@
 #define CAMPUS_GRAPH
 
 #include <vector>
+#include <queue>
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -45,6 +46,7 @@ class CampusGraph {
 		Building* GetBuildingByName(string name);
 		void DisplayAdjacencyList();
 		void ViewGraphStats();
+		void GetReachableBuildings(Building* start);
 	
 };
 
