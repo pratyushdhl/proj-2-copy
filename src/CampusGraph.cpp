@@ -102,7 +102,6 @@ CampusGraph::CampusGraph() {
 		}
 		getline(fin, inLine);
 	}
-	ViewGraphStats();
 	
 };
 
