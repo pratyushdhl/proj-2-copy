@@ -1,3 +1,6 @@
+#ifndef CAMPUS_GRAPH
+#define CAMPUS_GRAPH
+
 #include <vector>
 #include <iostream>
 #include <iomanip>
@@ -44,3 +47,5 @@ class CampusGraph {
 		void ViewGraphStats();
 	
 };
+
+#endif
