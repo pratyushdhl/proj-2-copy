@@ -1,6 +1,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -8,7 +9,7 @@ class Building {
 
 	private:
 		string name;
-		vector<Building> adjacent;
+		vector<Building*> adjacent;
 		
 	public:
 		// Constructors
@@ -17,18 +18,18 @@ class Building {
 		
 		// Get
 		string GetName();
-		vector<Building> GetAdjacent();
+		vector<Building*> GetAdjacent();
 		
 		// Set
 		void SetName(string name);
-		void AddAdjacent(Building building);
+		void AddAdjacent(Building* building);
 	
 };
 
 class CampusGraph {
 	
 	private:
-		vector<Building> buildings;
+		vector<Building*> buildings;
 	
 	public:
 		// Constructor
