@@ -1,0 +1,12 @@
+Ethan Rhodes:
+  -campus graph
+  -BFS reachability
+  -shortest path
+  -connectivity report
+
+Pratyush Dahal:
+  -department tree
+  -traversals
+  -department statistics
+
+Cesar Garcia:
