@@ -47,6 +47,7 @@ class CampusGraph {
 		void DisplayAdjacencyList();
 		void ViewGraphStats();
 		void GetReachableBuildings(Building* start);
+		void GetShortestPath(Building* start, Building* end);
 	
 };
 

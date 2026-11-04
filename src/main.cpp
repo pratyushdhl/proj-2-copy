@@ -43,6 +43,7 @@ int main() {
 		// Variables used in cases
 		string name;
 		Building* building = nullptr;
+		Building* building2 = nullptr;
 		
 		// Process choice
 		switch (choice) {
@@ -81,6 +82,24 @@ int main() {
 				break;
 			case 8:
 				// Find shortest path (BFS)
+				cout << "Enter start building: ";
+				cin.ignore();
+				getline(cin, name);
+				building = campusGraph.GetBuildingByName(name);
+				if (building == nullptr) {
+					// Invalid building, return to menu 
+					cout << "\nInvalid building name.\n" << endl;
+					break;
+				}
+				cout << "Enter destination building: ";
+				getline(cin, name);
+				building2 = campusGraph.GetBuildingByName(name);
+				if (building2 == nullptr) {
+					// Invalid building, return to menu 
+					cout << "\nInvalid building name.\n" << endl;
+					break;
+				}
+				campusGraph.GetShortestPath(building, building2);
 				break;
 			case 9:
 				// Add department
