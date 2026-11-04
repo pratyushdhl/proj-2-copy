@@ -226,3 +226,54 @@ void CampusGraph::GetReachableBuildings(Building* start) {
 	cout << "\nReachable: " << visited.size() << " of " << buildings.size() << " buildings\n" << endl;
 	
 }
+
+// Get shortest path using BFS
+void CampusGraph::GetShortestPath(Building* start, Building* end) {
+	
+	vector<Building*> visited;
+	vector<Building*> path;
+	bool found = false;
+	
+	// Start at start and add it to vectors
+	visited.push_back(start);
+	for (int i = 0; i < visited.size() && !found; i++) {
+		// Add ith building to path
+		path.push_back(visited[i]);
+		// Check each adjacent of ith building
+		for (int j = 0; j < visited[i]->GetAdjacent().size(); j++) {
+			// Check if end
+			if (visited[i]->GetAdjacent()[j] == end) {
+				// Ending building, end search
+				path.push_back(visited[i]->GetAdjacent()[j]);
+				found = true;
+				break;
+			}
+			// Check if visited
+			bool isvisited = false;
+			for (int k = 0; k < visited.size(); k++) {
+				if (visited[k] == visited[i]->GetAdjacent()[j]) {
+					isvisited = true;
+					break;
+				}
+			}
+			if (!isvisited) {
+				// Unvisited; add to visited
+				visited.push_back(visited[i]->GetAdjacent()[j]);
+			}
+		}
+	}
+	
+	// Path not found
+	if (!found) {
+		cout << "No path exists\n" << endl;
+		return;
+	}
+	
+	// Display path
+	cout << "\n" << start->GetName() << " to " << end->GetName() << ":" << endl;
+	for (int i = 0; i < path.size(); i++) {
+		cout << path[i]->GetName() << endl;
+	}
+	cout << "Number of connections: " << path.size()-1 << "\n" << endl;
+	
+}
