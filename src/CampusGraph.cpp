@@ -234,6 +234,12 @@ void CampusGraph::GetShortestPath(Building* start, Building* end) {
 	vector<Building*> path;
 	bool found = false;
 	
+	// Case start = end
+	if (start == end) {
+		path.push_back(start);
+		found = true;
+	}
+	
 	// Start at start and add it to vectors
 	visited.push_back(start);
 	for (int i = 0; i < visited.size() && !found; i++) {
