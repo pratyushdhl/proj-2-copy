@@ -11,13 +11,15 @@ Build instructions:
 Run instructions:
 
 * Run in /src (or wherever the built program is located):
-* Windows: a.exe
+* Windows CMD: a.exe
+* Windows PowerShell: ./a.exe
 * Linux: ./a.out
 
 Custom Data Directory instructions:
 
-* This is not required, /data will be used by default
+* This is not required, ../data/ will be used by default
 * Add an argument containing the directory name
 * Examples:
-* a.exe ../data
-* ./a.out ../data
+* a.exe ../data/
+* ./a.exe ../data/
+* ./a.out ../data/
