@@ -1,0 +1,7 @@
+Classes:
+The Building class is used to store information about a particular building, including name and adjacent buildings.
+
+The CampusGraph class is used to store all buildings and represent them as a graph. It can be used to display the adjacency list, find path distances and shortest paths using BFS, and display a connectivity report of the graph.
+
+Graph Representation:
+Graphs are represented by an adjacency list. The list displays each building followed by all buildings they are adjacent to. The adjacent buildings are indented to make the list more readable. The adjacency list format works cleanly in the console and provides the most scalability with increased data sizes.
