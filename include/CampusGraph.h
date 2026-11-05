@@ -40,7 +40,7 @@ class CampusGraph {
 	
 	public:
 		// Constructor
-		CampusGraph();
+		CampusGraph(string dataPath);
 		
 		// Get
 		Building* GetBuildingByName(string name);

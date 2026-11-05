@@ -2,9 +2,19 @@
 
 using namespace std;
 
-int main() {
+int main(int argc, char* argv[]) {
 	
-	CampusGraph campusGraph;
+	// Process custom data path
+	string dataPath;
+	if (argc > 1) {
+		dataPath = argv[1];
+		cout << "Using custom data path \"" << dataPath << "\"" << endl;
+	}
+	else {
+		dataPath = "../data/";
+	}
+	
+	CampusGraph campusGraph(dataPath);
 	
 	// Menu
 	int choice;

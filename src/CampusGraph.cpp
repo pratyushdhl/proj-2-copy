@@ -30,13 +30,13 @@ void Building::AddAdjacent(Building* building) {
 
 // ----- CampusGraph -----
 // Constructor
-CampusGraph::CampusGraph() {
+CampusGraph::CampusGraph(string dataPath) {
 	
 	// Load buildings file data
 	ifstream fin;
-	fin.open("../data/buildings.txt");
+	fin.open(dataPath + "buildings.txt");
 	if (!fin.is_open()) {
-		cout << "Failed to open buildings.txt." << endl;
+		cout << "Failed to open \"" << dataPath << "\"" << endl;
 	}
 	
 	// Read buildings line by line
@@ -57,7 +57,7 @@ CampusGraph::CampusGraph() {
 	fin.close();
 	
 	// Load connections file data
-	fin.open("../data/connections.txt");
+	fin.open(dataPath + "connections.txt");
 	if (!fin.is_open()) {
 		cout << "Failed to open connections.txt." << endl;
 	}
