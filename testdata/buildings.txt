@@ -1,0 +1,20 @@
+# BuildingName
+Library
+Student Union
+Science Building
+Engineering Building
+Business Building
+Gym
+Observatory
+observatory
+GYM
+
+EngineErINg BuildING
+
+# comment line
+
+
+
+gym
+gym
+gym
