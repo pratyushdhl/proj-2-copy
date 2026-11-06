@@ -21,6 +21,7 @@ int main(int argc, char* argv[]) {
 	bool menuActive = true;
 	while (menuActive) {
 		
+		/* OMMITTED FOR M1, KEEP FOR FINAL
 		// Display options
 		cout << "1. View all facilities" << endl;
 		cout << "2. Search facility by ID" << endl;
@@ -40,12 +41,24 @@ int main(int argc, char* argv[]) {
 		cout << "16. Facility category report" << endl;
 		cout << "17. Graph connectivity report" << endl;
 		cout << "18. Exit" << endl;
+		*/
+		// Temporary menu options for M1, remove for final
+		cout << "1.View all facilities" << endl;
+		cout << "2.Search facility by ID" << endl;
+		cout << "3.View campus graph" << endl;
+		cout << "4.Display graph counts and degrees" << endl;
+		cout << "5.Find reachable buildings (BFS)" << endl;
+		cout << "6.Add department" << endl;
+		cout << "7.Search department" << endl;
+		cout << "8.Display department hierarchy" << endl;
+		cout << "9.Run preorder traversal" << endl;
+		cout << "10.Exit" << endl;
 		
 		// Get choice
-		cout << "\nEnter option(1-18): ";
+		cout << "\nEnter option(1-10): ";
 		cin >> choice;
-		while (choice < 1 || choice > 18) {
-			cout << "\nInvalid input.\nEnter option(1-18): ";
+		while (choice < 1 || choice > 10) {
+			cout << "\nInvalid input.\nEnter option(1-10): ";
 			cin >> choice;
 		}
 		cout << endl;
@@ -55,6 +68,7 @@ int main(int argc, char* argv[]) {
 		Building* building = nullptr;
 		Building* building2 = nullptr;
 		
+		/* OMMITTED FOR M1, KEEP FOR FINAL
 		// Process choice
 		switch (choice) {
 			case 1:
@@ -139,6 +153,56 @@ int main(int argc, char* argv[]) {
 				// Graph connectivity report
 				break;
 			case 18:
+				// Exit
+				menuActive = false;
+				break;
+			default:
+				// Default case
+				cout << "Main.cpp switch case invalid case." << endl;
+		}
+		*/
+		// Temporary process choice for M1, remove for final
+		switch (choice) {
+			case 1:
+				// View all facilities
+				break;
+			case 2:
+				// Search facility by ID
+				break;
+			case 3:
+				// View campus graph
+				campusGraph.DisplayAdjacencyList();
+				break;
+			case 4:
+				// Display graph counts and degrees
+				campusGraph.ViewGraphStats();
+				break;
+			case 5:
+				// Find reachable buildings (BFS)
+				cout << "Enter start building: ";
+				cin.ignore();
+				getline(cin, name);
+				building = campusGraph.GetBuildingByName(name);
+				if (building == nullptr) {
+					// Invalid building, return to menu 
+					cout << "\nInvalid building name.\n" << endl;
+					break;
+				}
+				campusGraph.GetReachableBuildings(building);
+				break;
+				break;
+			case 6:
+				// Add department
+				break;
+			case 7:
+				// Search department
+			case 8:
+				// Display department heirarchy
+				break;
+			case 9:
+				// Run preorder traversal
+				break;
+			case 10:
 				// Exit
 				menuActive = false;
 				break;
