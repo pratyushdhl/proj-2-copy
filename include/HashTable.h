@@ -10,9 +10,25 @@
 #include <cctype>
 #include "Facility.h"
 
+using namespace std;
+
 class HashTable {
 private:
     struct HashNode {
       string key;
       Facility facility;
+    };
+
+    vector <list<HashNode>> table;
+    int capacity;
+    int entries;
+    int hashFunction const;
+
+    public:
+
+    int getCapacity();
+    int getEntries;
+
 };
+
+#endif
