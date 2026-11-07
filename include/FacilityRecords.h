@@ -11,3 +11,8 @@
 
 using namespace std;
 
+class Facility {
+private:
+  std::string id;
+
+
