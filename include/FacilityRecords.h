@@ -13,7 +13,23 @@ using namespace std;
 
 class Facility {
 private:
-  std::string id;
+  string name;
+  string id;
+  string building;
+  string category;
+
+public:
+  Facility(string i, string n, string b, string c);
+
+string getName() const;
+string getID () const;
+string getBuilding const;
+string getCategory() const;
+
+void display() const;
+
+};
+
+#endif
 
 
-}
