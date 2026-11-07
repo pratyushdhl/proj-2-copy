@@ -1,4 +1,7 @@
+// Purpose: campus graph and BFS. Original graph: Ethan Rhodes; M1 updates: Codex (AI assistance).
 #include "../include/CampusGraph.h"
+#include "../include/FileUtils.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -30,100 +33,41 @@ void Building::AddAdjacent(Building* building) {
 
 // ----- CampusGraph -----
 // Constructor
-CampusGraph::CampusGraph(string dataPath) {
-	
-	// Load buildings file data
-	ifstream fin;
-	fin.open(dataPath + "buildings.txt");
-	if (!fin.is_open()) {
-		cout << "Failed to open \"" << dataPath << "\"" << endl;
-	}
-	
-	// Read buildings line by line
-	string inLine;
-	while (!fin.eof()) {
-		getline(fin, inLine);
-		// Ignore comments an blank lines
-		if (inLine[0] != '#' && inLine != "") {
-			// Ensure name is unused
-			if (GetBuildingByName(inLine) == nullptr) {
-				// Add to vector
-				Building* building = new Building(inLine);
-				buildings.push_back(building);
-			}
-		}
-	}
-	
-	fin.close();
-	
-	// Load connections file data
-	fin.open(dataPath + "connections.txt");
-	if (!fin.is_open()) {
-		cout << "Failed to open connections.txt." << endl;
-	}
-	
-	// Read connections line by line
-	connectionCount = 0;
-	string bnameA, bnameB;
-	Building* buildingA;
-	Building* buildingB;
-	buildingA = nullptr;
-	buildingB = nullptr;
-	getline(fin, inLine);
-	while (!fin.eof()) {
-		// Ignore comments and blank lines
-		if (inLine[0] != '#' && inLine != "") {
-			// Split by bar
-			stringstream ss(inLine);
-			getline(ss, bnameA, '|');
-			getline(ss, bnameB);
-			// Find building objects
-			buildingA = GetBuildingByName(bnameA);
-			buildingB = GetBuildingByName(bnameB);
-			// Ensure both buildings found
-			if (buildingA != nullptr && buildingB != nullptr) {
-				// Check if self connection
-				if (buildingA != buildingB) {
-					// Check if connection exists already
-					bool copy = false;
-					for (int i = 0; i < buildingA->GetAdjacent().size(); i++) {
-						if (buildingA->GetAdjacent()[i] == buildingB) {
-							copy = true;
-							break;
-						}
-					}
-					if (!copy) {
-						connectionCount++;
-						buildingA->AddAdjacent(buildingB);
-						buildingB->AddAdjacent(buildingA);
-					}
-				}
-			}
-		}
-		getline(fin, inLine);
-	}
-	
-};
+CampusGraph::CampusGraph(string dataPath) : connectionCount(0) {
+    Input::load(dataPath, "buildings.txt", [&](const vector<string>& f) -> string {
+        if (!Input::validFields(f, 1)) return "expected one nonempty field";
+        if (GetBuildingByName(f[0])) return "duplicate building: " + f[0];
+        buildings.push_back(new Building(f[0]));
+        return "";
+    });
+    Input::load(dataPath, "connections.txt", [&](const vector<string>& f) -> string {
+        if (!Input::validFields(f, 2)) return "expected two nonempty fields";
+        Building* a = GetBuildingByName(f[0]);
+        Building* b = GetBuildingByName(f[1]);
+        if (!a) return "unknown building: " + f[0];
+        if (!b) return "unknown building: " + f[1];
+        if (a == b) return "self-connection: " + f[0];
+        const auto neighbors = a->GetAdjacent();
+        if (find(neighbors.begin(), neighbors.end(), b) != neighbors.end())
+            return "duplicate connection: " + f[0] + " | " + f[1];
+        a->AddAdjacent(b);
+        b->AddAdjacent(a);
+        ++connectionCount;
+        return "";
+    });
+}
 
-// Get building pointer using building name
+// Release the graph's owned buildings; adjacency pointers are non-owning.
+CampusGraph::~CampusGraph() {
+    for (Building* building : buildings) delete building;
+}
+
+// Match ASCII case and outer whitespace, preserving internal spaces.
 Building* CampusGraph::GetBuildingByName(string name) {
-	// Check each existing building
-	for (int i = 0; i < buildings.size(); i++) {
-		// Length equality check
-		if (buildings[i]->GetName().length() == name.length()) {
-			// String comparison with no case sense
-			bool copy = true;
-			for (int j = 0; j < buildings[i]->GetName().length(); j++) {
-				if (tolower(buildings[i]->GetName()[j]) != tolower(name[j])) {
-					copy = false;
-					break;
-				}
-			}
-			if (copy) return buildings[i];
-		}
-	}
-	// No copy found
-	return nullptr;
+    const string key = Input::key(name);
+    for (Building* building : buildings)
+        if (Input::key(building->GetName()) == key) return building;
+    return nullptr;
 }
 
 // Display adjacency list of graph 
@@ -133,12 +77,12 @@ void CampusGraph::DisplayAdjacencyList() {
 	// Check if buildings exist
 	if (buildings.size() > 0) {
 		// Display each building
-		for (int i = 0; i < buildings.size(); i++) {
+		for (size_t i = 0; i < buildings.size(); i++) {
 			cout << buildings[i]->GetName() << ':' << endl;
 			// Check if adjacent exists
 			if (buildings[i]->GetAdjacent().size() > 0) {
 				// Display adjacency
-				for (int j = 0; j < buildings[i]->GetAdjacent().size(); j++) {
+				for (size_t j = 0; j < buildings[i]->GetAdjacent().size(); j++) {
 					cout << "\t" << buildings[i]->GetAdjacent()[j]->GetName();
 					if (j == buildings[i]->GetAdjacent().size()-1) {
 						cout << "\n" << endl;
@@ -163,8 +107,8 @@ void CampusGraph::DisplayAdjacencyList() {
 
 void CampusGraph::ViewGraphStats() {
 	// Find longest building name
-	int nameLen = 0;
-	for (int i = 0; i < buildings.size(); i++) {
+	size_t nameLen = 8;
+	for (size_t i = 0; i < buildings.size(); i++) {
 		if (buildings[i]->GetName().length() > nameLen) {
 			nameLen = buildings[i]->GetName().length();
 		}
@@ -173,16 +117,16 @@ void CampusGraph::ViewGraphStats() {
 	cout << "--------------- Graph counts and degrees ---------------\n" << endl;
 	// Table header
 	cout << left << setw(nameLen+1) << "Building" << "| Degree" << endl;
-	for (int i = 0; i < nameLen+9; i++) {
+	for (size_t i = 0; i < nameLen+9; i++) {
 		cout << '-';
 	}
 	cout << endl;
 	// Display each building and degree
-	for (int i = 0; i < buildings.size(); i++) {
+	for (size_t i = 0; i < buildings.size(); i++) {
 		cout << setw(nameLen+1) << buildings[i]->GetName() << "| ";
 		cout << buildings[i]->GetAdjacent().size() << endl;
 	}
-	for (int i = 0; i < nameLen+9; i++) {
+	for (size_t i = 0; i < nameLen+9; i++) {
 		cout << '-';
 	}
 	// Building and connection count
@@ -193,38 +137,28 @@ void CampusGraph::ViewGraphStats() {
 
 // Get reachable buildings using BFS
 void CampusGraph::GetReachableBuildings(Building* start) {
-	vector<Building*> visited;
-	vector<int> distances;
-	
-	// Start at start and add it to vectors
-	visited.push_back(start);
-	distances.push_back(0);
-	for (int i = 0; i < visited.size(); i++) {
-		// Check each adjacent of ith building
-		for (int j = 0; j < visited[i]->GetAdjacent().size(); j++) {
-			// Check if visited
-			bool isvisited = false;
-			for (int k = 0; k < visited.size(); k++) {
-				if (visited[k] == visited[i]->GetAdjacent()[j]) {
-					isvisited = true;
-					break;
-				}
-			}
-			if (!isvisited) {
-				// Unvisited; add to vectors
-				visited.push_back(visited[i]->GetAdjacent()[j]);
-				distances.push_back(distances[i]+1);
-			}
-		}
-	}
-	
-	// Display results
-	cout << "\nFrom " << start->GetName() << ":" << endl;
-	for (int i = 0; i < visited.size(); i++) {
-		cout << visited[i]->GetName() << " (distance " << distances[i] << ")" << endl;
-	}
-	cout << "\nReachable: " << visited.size() << " of " << buildings.size() << " buildings\n" << endl;
-	
+    if (!start) {
+        cout << "Unknown starting building.\n";
+        return;
+    }
+    vector<Building*> visited;
+    queue<pair<Building*, int>> pending;
+    visited.push_back(start);
+    pending.push({start, 0});
+    cout << "\nFrom " << start->GetName() << ":\n";
+    while (!pending.empty()) {
+        const auto current = pending.front();
+        pending.pop();
+        cout << current.first->GetName() << " (distance " << current.second << ")\n";
+        for (Building* neighbor : current.first->GetAdjacent()) {
+            if (find(visited.begin(), visited.end(), neighbor) == visited.end()) {
+                // Mark on enqueue so cycles never enqueue a vertex twice.
+                visited.push_back(neighbor);
+                pending.push({neighbor, current.second + 1});
+            }
+        }
+    }
+    cout << "\nReachable: " << visited.size() << " of " << buildings.size() << " buildings\n\n";
 }
 
 // Get shortest path using BFS
@@ -242,11 +176,11 @@ void CampusGraph::GetShortestPath(Building* start, Building* end) {
 	
 	// Start at start and add it to vectors
 	visited.push_back(start);
-	for (int i = 0; i < visited.size() && !found; i++) {
+	for (size_t i = 0; i < visited.size() && !found; i++) {
 		// Add ith building to path
 		path.push_back(visited[i]);
 		// Check each adjacent of ith building
-		for (int j = 0; j < visited[i]->GetAdjacent().size(); j++) {
+		for (size_t j = 0; j < visited[i]->GetAdjacent().size(); j++) {
 			// Check if end
 			if (visited[i]->GetAdjacent()[j] == end) {
 				// Ending building, end search
@@ -256,7 +190,7 @@ void CampusGraph::GetShortestPath(Building* start, Building* end) {
 			}
 			// Check if visited
 			bool isvisited = false;
-			for (int k = 0; k < visited.size(); k++) {
+			for (size_t k = 0; k < visited.size(); k++) {
 				if (visited[k] == visited[i]->GetAdjacent()[j]) {
 					isvisited = true;
 					break;
@@ -277,7 +211,7 @@ void CampusGraph::GetShortestPath(Building* start, Building* end) {
 	
 	// Display path
 	cout << "\n" << start->GetName() << " to " << end->GetName() << ":" << endl;
-	for (int i = 0; i < path.size(); i++) {
+	for (size_t i = 0; i < path.size(); i++) {
 		cout << path[i]->GetName() << endl;
 	}
 	cout << "Number of connections: " << path.size()-1 << "\n" << endl;

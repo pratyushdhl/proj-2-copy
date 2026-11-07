@@ -1,0 +1,4 @@
+# F001 and F013 both hash to bucket 3 at capacity 11
+F001|First Record|Library|Library
+F013|Colliding Record|Library|Library
+f001|Rejected Duplicate|Library|Library
