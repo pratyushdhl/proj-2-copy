@@ -5,3 +5,53 @@ The CampusGraph class is used to store all buildings and represent them as a gra
 
 Graph Representation:
 Graphs are represented by an adjacency list. The list displays each building followed by all buildings they are adjacent to. The adjacent buildings are indented to make the list more readable. The adjacency list format works cleanly in the console and provides the most scalability with increased data sizes.
+
+
+Milestone 1 additions and corrections (Codex AI assistance)
+
+Hash function and table:
+Normalize keys by trimming and converting to uppercase before validation,
+insertion, hashing, or lookup. IDs are F followed by exactly three ASCII digits.
+Use h0 = 0 and h(i+1) = (31*h(i) + unsigned ASCII(key[i])) mod C.
+C defaults to HashTable::INITIAL_CAPACITY = 11 and can be a constructor argument.
+No std::hash, map, unordered_map, or library hash table is used. Each vector
+bucket holds a list of key/Facility nodes (separate chaining). Chaining permits
+unlimited chain growth without full-table rejection; the permitted ID format
+itself limits distinct keys to F000-F999.
+One collision is counted per accepted insertion into an already nonempty
+bucket, regardless of chain length. Searches, invalid keys and rejected
+duplicates do not increment it. F001 and F013 both land in bucket 3 at C=11.
+testdata/collision accepts them, then rejects f001, reporting capacity 11,
+entries 2, collisions 1. Removing the duplicate gives the same collision count.
+Duplicates retain the original record. Lookup visits only its bucket: expected
+O(1 + chain length), worst case O(n).
+
+Graph and BFS:
+The original vector of Building pointers and per-building neighbor vectors
+remain the shared adjacency-list representation. O(V+E) storage scales with
+the graph and preserves file/neighbor order. Accepted edges update both
+endpoints; reversed duplicates and self-connections are rejected. Building
+lookup uses a trimmed, case-insensitive scan. BFS uses a FIFO std::queue of
+(building, distance) and a visited vector marked at enqueue. It preserves
+neighbor order and includes the start at distance zero. Linear visited checks
+give O(V*(V+E)) worst-case traversal time. A destructor releases owned buildings.
+
+Modules:
+Facility stores normalized ID and display fields. FacilityDatabase validates
+building references, preserves first accepted category spelling, keeps file
+order in a vector, and delegates ID lookup to HashTable. FileUtils.h provides
+line loading, splitting, ASCII normalization, warnings with file/line number,
+and accepted/rejected summaries. CampusGraph loads buildings then connections;
+FacilityDatabase loads facilities; DepartmentTree loads departments last.
+Missing files are reported and treated as empty.
+DepartmentNode owns any number of children through unique_ptr and borrows its
+parent pointer. DepartmentTree validates parents before insertion, searches
+names without regard to case, computes depth from parent links, and runs
+recursive preorder with optional four-space indentation. Siblings retain
+insertion order. Tree search and preorder are O(n), recursive space O(height).
+main.cpp coordinates initialization, prompts and menu calls. Complete-line menu
+parsing rejects text, blank input, extra tokens and values outside 0-10. EOF
+exits. Root insertion omits the parent prompt when the tree is empty.
+
+Scope: only M1 behavior was implemented and tested. Existing Final reference
+code remains; no Final-only menu features or reports were added.

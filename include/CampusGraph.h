@@ -1,3 +1,4 @@
+// Purpose: campus graph declarations. Original graph: Ethan Rhodes; M1 updates: Codex (AI assistance).
 #ifndef CAMPUS_GRAPH
 #define CAMPUS_GRAPH
 
@@ -41,6 +42,10 @@ class CampusGraph {
 	public:
 		// Constructor
 		CampusGraph(string dataPath);
+		// Buildings are owned by this graph, so copying is disabled.
+		~CampusGraph();
+		CampusGraph(const CampusGraph&) = delete;
+		CampusGraph& operator=(const CampusGraph&) = delete;
 		
 		// Get
 		Building* GetBuildingByName(string name);

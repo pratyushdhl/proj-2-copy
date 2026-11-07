@@ -1,4 +1,8 @@
+// Purpose: Milestone 1 initialization and menu. Author: project team; M1 integration: Codex (AI assistance).
 #include "../include/CampusGraph.h"
+#include "../include/FacilityDatabase.h"
+#include "../include/DepartmentTree.h"
+#include "../include/FileUtils.h"
 
 using namespace std;
 
@@ -11,10 +15,12 @@ int main(int argc, char* argv[]) {
 		cout << "Using custom data path \"" << dataPath << "\"" << endl;
 	}
 	else {
-		dataPath = "../data/";
+		dataPath = "data/";
 	}
 	
 	CampusGraph campusGraph(dataPath);
+	FacilityDatabase facilities(dataPath, campusGraph);
+	DepartmentTree departments(dataPath);
 	
 	// Menu
 	int choice;
@@ -54,20 +60,22 @@ int main(int argc, char* argv[]) {
 		cout << "9.Run preorder traversal" << endl;
 		cout << "10.Exit" << endl;
 		
-		// Get choice
-		cout << "\nEnter option(1-10): ";
-		cin >> choice;
-		while (choice < 1 || choice > 10) {
-			cout << "\nInvalid input.\nEnter option(1-10): ";
-			cin >> choice;
-		}
-		cout << endl;
-		
-		// Variables used in cases
-		string name;
-		Building* building = nullptr;
-		Building* building2 = nullptr;
-		
+        // Read a complete line so blank/text input and EOF recover cleanly.
+        cout << "\nEnter option(1-10, or 0 to exit): ";
+        string input, extra;
+        if (!getline(cin, input)) break;
+        istringstream option(input);
+        if (!(option >> choice) || (option >> extra) || choice < 0 || choice > 10) {
+            cout << "Invalid menu input. Enter a number from 1 to 10, or 0 to exit.\n";
+            continue;
+        }
+        if (choice == 0) break;
+        cout << endl;
+
+        // Variables used by Milestone 1 operations.
+        string name, parent;
+        Building* building = nullptr;
+
 		/* OMMITTED FOR M1, KEEP FOR FINAL
 		// Process choice
 		switch (choice) {
@@ -165,9 +173,13 @@ int main(int argc, char* argv[]) {
 		switch (choice) {
 			case 1:
 				// View all facilities
+				facilities.displayAll();
 				break;
 			case 2:
 				// Search facility by ID
+				cout << "Enter facility ID: ";
+				if (!getline(cin, name)) return 0;
+				facilities.searchID(name);
 				break;
 			case 3:
 				// View campus graph
@@ -180,27 +192,49 @@ int main(int argc, char* argv[]) {
 			case 5:
 				// Find reachable buildings (BFS)
 				cout << "Enter start building: ";
-				cin.ignore();
-				getline(cin, name);
+				if (!getline(cin, name)) return 0;
 				building = campusGraph.GetBuildingByName(name);
 				if (building == nullptr) {
 					// Invalid building, return to menu 
-					cout << "\nInvalid building name.\n" << endl;
+					cout << "Unknown or blank building: " << Input::trim(name) << "\n";
 					break;
 				}
 				campusGraph.GetReachableBuildings(building);
 				break;
-				break;
 			case 6:
-				// Add department
-				break;
+				// Additions are in memory only; an empty tree needs no parent prompt.
+                cout << "Enter department name: ";
+                if (!getline(cin, name)) return 0;
+                if (Input::trim(name).empty()) {
+                    cout << "Department name cannot be blank.\n";
+                    break;
+                }
+                parent = "NONE";
+                if (!departments.empty()) {
+                    cout << "Enter parent department: ";
+                    if (!getline(cin, parent)) return 0;
+                    if (Input::trim(parent).empty()) {
+                        cout << "Parent name cannot be blank.\n";
+                        break;
+                    }
+                }
+                input = departments.add(name, parent);
+                if (input.empty()) cout << "Department added: " << Input::trim(name) << '\n';
+                else cout << "Error: " << input << '\n';
+                break;
 			case 7:
 				// Search department
-			case 8:
-				// Display department heirarchy
+                cout << "Enter department name: ";
+                if (!getline(cin, name)) return 0;
+                departments.search(name);
+                break;
+            case 8:
+				// Display department hierarchy
+				departments.displayHierarchy();
 				break;
 			case 9:
 				// Run preorder traversal
+				departments.displayPreorder();
 				break;
 			case 10:
 				// Exit

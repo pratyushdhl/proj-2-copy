@@ -1,0 +1,131 @@
+Milestone 1 test results
+Environment: Linux cloud workspace; g++ 14.2.0; Python 3.12.14.
+UNT CELL: not tested here; the team must verify on CELL before submission.
+
+Build (from repository root):
+  mkdir -p build
+  g++ -std=c++11 -Wall -Wextra -Wpedantic src/*.cpp -o build/campus
+Actual: compilation succeeded, no warnings.
+
+Reproduce tests:
+  python3 tests/test_milestone1.py
+  g++ -std=c++11 -Wall -Wextra -Wpedantic tests/hash_table_test.cpp src/HashTable.cpp src/FacilityRecords.cpp -o build/hash_table_test
+  ./build/hash_table_test
+Temporary fixture contents are specified in tests/test_milestone1.py.
+The permanent collision fixture is testdata/collision/.
+
+Test 1: Sample loading, file order, duplicate facility names, graph degrees
+Input directory: data/ (default)
+Menu input: '1\n3\n4\n10\n'
+Expected: ['buildings.txt: 7 accepted, 0 rejected\nconnections.txt: 6 accepted, 0 rejected\nfacilities.txt: 10 accepted, 0 rejected (hash capacity 11, entries 10, collisions 1)\ndepartments.txt: 7 accepted, 0 rejected', 'F005 | Room 101 | Engineering Building | Classroom', 'F007 | Room 101 | Business Building | Classroom', 'Total facilities: 10', 'Observatory:\n\t(no connections)', 'Library              | 2', 'Student Union        | 3', 'Science Building     | 2', 'Engineering Building | 1', 'Business Building    | 2', 'Gym                  | 2', 'Observatory          | 0', 'Total buildings: 7', 'Total connections: 6'] Absent: () Counts: ()
+Actual: exit 0; all expected output matched; exclusions and counts verified.
+Result: PASS
+
+Test 2: ID lookup: found, lowercase, invalid, absent
+Input directory: data/ (default)
+Menu input: '2\nF004\n2\n f004 \n2\n004\n2\nf999\n10\n'
+Expected: ['F004 | Computer Lab A | Science Building | Computer Lab', 'Invalid format: an ID is F followed by exactly three digits.', 'Not found: no facility with ID F999'] Absent: () Counts: [('F004 | Computer Lab A', 2)]
+Actual: exit 0; all expected output matched; exclusions and counts verified.
+Result: PASS
+
+Test 3: BFS visit order, cycles, isolated component, unknown start
+Input directory: data/ (default)
+Menu input: '5\n library \n5\nObservatory\n5\nUnknown Hall\n10\n'
+Expected: ['Library (distance 0)\nStudent Union (distance 1)\nBusiness Building (distance 1)\nScience Building (distance 2)\nGym (distance 2)\nEngineering Building (distance 3)', 'Reachable: 6 of 7 buildings', 'Observatory (distance 0)', 'Reachable: 1 of 7 buildings', 'Unknown or blank building: Unknown Hall'] Absent: () Counts: ()
+Actual: exit 0; all expected output matched; exclusions and counts verified.
+Result: PASS
+
+Test 4: Department root, non-root, missing search, hierarchy, preorder
+Input directory: data/ (default)
+Menu input: '7\n UNIVERSITY \n7\n computer science \n7\nMissing\n8\n9\n10\n'
+Expected: ['Department: University\nParent: None\nDirect children: 2\nDepth: 0', 'Department: Computer Science\nParent: College of Engineering\nDirect children: 0\nDepth: 2', 'Department not found: Missing', 'University\n    College of Engineering\n        Computer Science\n        Electrical Engineering\n    College of Science\n        Mathematics\n        Physics', 'University\nCollege of Engineering\nComputer Science\nElectrical Engineering\nCollege of Science\nMathematics\nPhysics'] Absent: () Counts: ()
+Actual: exit 0; all expected output matched; exclusions and counts verified.
+Result: PASS
+
+Test 5: Menu addition, unknown parent, duplicate name, in-memory persistence
+Input directory: data/ (default)
+Menu input: '6\nNew Department\nUnknown Parent\n6\n UNIVERSITY \nUniversity\n6\nNew Department\n college of science \n7\nnew department\n10\n'
+Expected: ['Error: unknown parent: Unknown Parent', 'Error: duplicate department: UNIVERSITY', 'Department added: New Department', 'Department: New Department\nParent: College of Science\nDirect children: 0\nDepth: 2'] Absent: () Counts: ()
+Actual: exit 0; all expected output matched; exclusions and counts verified.
+Result: PASS
+
+Test 6: Invalid menu input, blank names, spaces, repeated recovery
+Input directory: data/ (default)
+Menu input: '\nletters\n-1\n11\n2 extra\n999999999999999999999\n5\n \n6\n \n7\n \n6\nChild\n \n2\n \n5\n Student Union \n0\n'
+Expected: ['Department name cannot be blank.', 'Parent name cannot be blank.', 'Invalid format: an ID is F followed by exactly three digits.', 'From Student Union:', 'Reachable: 6 of 7 buildings'] Absent: () Counts: [('Invalid menu input.', 6)]
+Actual: exit 0; all expected output matched; exclusions and counts verified.
+Result: PASS
+
+Test 7: Collision fixture and rejected duplicate keep original record and count
+Input directory: testdata/collision
+Menu input: '1\n2\nf001\n2\nf013\n10\n'
+Expected: ['Warning: facilities.txt:4: duplicate facility ID: F001', 'facilities.txt: 2 accepted, 1 rejected (hash capacity 11, entries 2, collisions 1)', 'F001 | First Record | Library | Library', 'F013 | Colliding Record | Library | Library'] Absent: ['Rejected Duplicate'] Counts: ()
+Actual: exit 0; all expected output matched; exclusions and counts verified.
+Result: PASS
+
+Test 8: Validation, CRLF, whitespace, comments, final line without newline
+Input directory: /tmp/campus-m1-3onf9087
+Menu input: '1\n4\n5\nstudent union\n7\nphysics\n10\n'
+Expected: ['buildings.txt: 3 accepted, 2 rejected', 'connections.txt: 1 accepted, 5 rejected', 'facilities.txt: 2 accepted, 6 rejected', 'departments.txt: 3 accepted, 6 rejected', 'Warning: buildings.txt:4: duplicate building:', 'Warning: buildings.txt:6: expected one nonempty field', 'Warning: connections.txt:3: duplicate connection:', 'Warning: connections.txt:4: unknown building: Missing', 'Warning: connections.txt:5: self-connection:', 'Warning: facilities.txt:3: duplicate facility ID: F001', 'Warning: facilities.txt:4: unknown building: Missing', 'Warning: departments.txt:4: unknown parent: Unknown', 'F001 | Room #5 | Library | Computer Lab', 'F006 | Second | Student Union | Computer Lab', 'Total connections: 1', 'Reachable: 2 of 3 buildings', 'Department: Physics\nParent: College of Science\nDirect children: 0\nDepth: 2'] Absent: ['Later |', 'Second Root\n'] Counts: ()
+Actual: exit 0; all expected output matched; exclusions and counts verified.
+Result: PASS
+
+Test 9: Empty structures and adding the first root without a parent prompt
+Input directory: /tmp/campus-m1-3onf9087
+Menu input: '1\n2\nF001\n3\n4\n5\nLibrary\n7\nMissing\n8\n9\n6\nNew University\n7\nnew university\n8\n9\n10\n'
+Expected: ['buildings.txt: 0 accepted, 0 rejected', 'connections.txt: 0 accepted, 0 rejected', 'facilities.txt: 0 accepted, 0 rejected (hash capacity 11, entries 0, collisions 0)', 'departments.txt: 0 accepted, 0 rejected', 'No facilities available.', 'Total facilities: 0', 'No buildings exist.', 'Total buildings: 0', 'Total connections: 0', 'No departments available.', 'Department added: New University', 'Department: New University\nParent: None\nDirect children: 0\nDepth: 0'] Absent: ['Enter parent department:'] Counts: ()
+Actual: exit 0; all expected output matched; exclusions and counts verified.
+Result: PASS
+
+Test 10: All four missing files continue with zero summaries
+Input directory: /tmp/campus-m1-3onf9087
+Menu input: '1\n8\n0\n'
+Expected: ['cannot open /tmp/campus-m1-3onf9087/buildings.txt', 'cannot open /tmp/campus-m1-3onf9087/connections.txt', 'cannot open /tmp/campus-m1-3onf9087/facilities.txt', 'cannot open /tmp/campus-m1-3onf9087/departments.txt', 'facilities.txt: 0 accepted, 0 rejected (hash capacity 11, entries 0, collisions 0)', 'No facilities available.', 'No departments available.'] Absent: () Counts: ()
+Actual: exit 0; all expected output matched; exclusions and counts verified.
+Result: PASS
+
+Test 11: Missing connections alone preserves buildings and later files
+Input directory: /tmp/campus-m1-3onf9087
+Menu input: '4\n5\nLibrary\n10\n'
+Expected: ['Error: cannot open /tmp/campus-m1-3onf9087/connections.txt', 'buildings.txt: 7 accepted, 0 rejected', 'connections.txt: 0 accepted, 0 rejected', 'facilities.txt: 10 accepted, 0 rejected', 'departments.txt: 7 accepted, 0 rejected', 'Total connections: 0', 'Reachable: 1 of 7 buildings'] Absent: () Counts: ()
+Actual: exit 0; all expected output matched; exclusions and counts verified.
+Result: PASS
+
+Test 12: Same collision count with no duplicate attempt
+Input directory: /tmp/campus-m1-3onf9087
+Menu input: '0\n'
+Expected: ['facilities.txt: 2 accepted, 0 rejected (hash capacity 11, entries 2, collisions 1)'] Absent: () Counts: ()
+Actual: exit 0; all expected output matched; exclusions and counts verified.
+Result: PASS
+
+Test 13: EOF at menu exits cleanly
+Input directory: data/ (default)
+Menu input: ''
+Expected: ['departments.txt: 7 accepted, 0 rejected'] Absent: () Counts: ()
+Actual: exit 0; all expected output matched; exclusions and counts verified.
+Result: PASS
+
+Test 14: EOF during a name prompt exits cleanly
+Input directory: data/ (default)
+Menu input: '5\n'
+Expected: ['Enter start building:'] Absent: () Counts: ()
+Actual: exit 0; all expected output matched; exclusions and counts verified.
+Result: PASS
+
+14 scenarios passed. All original data/ files remained byte-identical.
+
+Test 15: direct custom hash-table operations
+Input: F001, F013, duplicate f001, invalid BAD, then F100-F149
+Expected: two entries / one collision before and after duplicate; original retained; invalid rejected; 52 entries in capacity 11; all lookups found
+Actual: every assertion passed; chains grew beyond capacity without rejecting valid keys
+Result: PASS
+
+Memory/undefined behavior check:
+  g++ -std=c++11 -Wall -Wextra -Wpedantic -g -fsanitize=address,undefined -fno-omit-frame-pointer src/*.cpp -o build/campus-sanitized
+  ASAN_OPTIONS=detect_leaks=1 python3 tests/test_milestone1.py build/campus-sanitized
+Expected: 14 scenarios pass without sanitizer or leak diagnostics.
+Actual: all 14 scenarios passed; no AddressSanitizer, LeakSanitizer or UBSan diagnostics.
+Result: PASS
+
+Scope: only M1 tests and behavior are claimed. CELL execution, live demo, and
+team contribution evidence are not established by these local test results.
